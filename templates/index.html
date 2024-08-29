@@ -7,9 +7,12 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-    <h1 class="bitcoinPrice">Bitcoin Price</h1>
-    <div id="crypto-price"></div>
-
-    <script src="{{ url_for('static', filename='script.js') }}"></script>
+    <div class="valoresBTC"
+        <h1 class="bitcoinPrice">Bitcoin Price</h1>
+            <div id="crypto-price"></div>
+        <h1 class="bitcoinPrice">Dogecoin Price</h1>
+            <div id="crypto-price-dogecoin"></div>
+    </div>
+        <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
 </html>
