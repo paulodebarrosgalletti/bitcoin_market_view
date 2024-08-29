@@ -9,6 +9,12 @@ h1 {
     color: #333;
 }
 
+.bitcoinPrice{
+    background-color: aqua;
+    margin: 10px 10px;
+    display: flex;
+    align-items: center;
+}
 #crypto-price {
     font-size: 1.5em;
     margin: 20px;
