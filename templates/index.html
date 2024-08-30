@@ -7,12 +7,38 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-    <div class="valoresBTC"
-        <h1 class="bitcoinPrice">Bitcoin Price</h1>
-            <div id="crypto-price"></div>
-        <h1 class="bitcoinPrice">Dogecoin Price</h1>
-            <div id="crypto-price-dogecoin"></div>
-    </div>
-        <script src="{{ url_for('static', filename='script.js') }}"></script>
+    <header>
+        <h1>Crypto Tracker</h1>
+    </header>
+    <main>
+        <section class="crypto-section">
+            <div class="crypto-card" id="bitcoin-card">
+                <h2>Bitcoin</h2>
+                <div class="price" id="crypto-price">$0.00</div>
+                <div class="details" id="bitcoin-details"></div>
+                <div class="update-timer">
+                    Next update in <span id="bitcoin-timer">50</span> seconds
+                    <br>
+                    Last update: <span id="bitcoin-last-updated">Never</span>
+                </div>
+            </div>
+
+            <div class="crypto-card" id="dogecoin-card">
+                <h2>Dogecoin</h2>
+                <div class="price" id="crypto-price-dogecoin">$0.00</div>
+                <div class="details" id="dogecoin-details"></div>
+                <div class="update-timer">
+                    Next update in <span id="dogecoin-timer">50</span> seconds
+                    <br>
+                    Last update: <span id="dogecoin-last-updated">Never</span>
+                </div>
+            </div>
+        </section>
+    </main>
+    <footer>
+        <p>&copy; 2024 Crypto Tracker. All rights reserved.</p>
+    </footer>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
 </html>

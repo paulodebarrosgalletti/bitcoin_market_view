@@ -1,21 +1,61 @@
 body {
     font-family: Arial, sans-serif;
-    background-color: #f4f4f4;
+    background-color: #2C2D3C;
+    color: #E5BA10;
     margin: 0;
     padding: 0;
 }
 
-h1 {
-    color: #333;
+header {
+    background-color: #101AE6;
+    color: #fff;
+    padding: 20px;
+    text-align: center;
 }
 
-.bitcoinPrice{
-    background-color: aqua;
-    margin: 10px 10px;
+main {
+    padding: 20px;
     display: flex;
-    align-items: center;
+    justify-content: center;
 }
-#crypto-price {
-    font-size: 1.5em;
-    margin: 20px;
+
+.crypto-section {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+.crypto-card {
+    background-color: #3A3E91;
+    border: 2px solid #A68F35;
+    border-radius: 10px;
+    padding: 20px;
+    width: 400px;
+    text-align: center;
+    color: #E5BA10;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.price {
+    font-size: 2em;
+    margin: 10px 0;
+}
+
+.details {
+    font-size: 0.8em;
+    margin: 5px 0;
+    color: #A68F35;
+}
+
+.update-timer {
+    margin-top: 10px;
+    font-size: 0.9em;
+    color: #A68F35;
+}
+
+footer {
+    background-color: #101AE6;
+    color: #fff;
+    text-align: center;
+    padding: 10px;
 }
