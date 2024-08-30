@@ -1,7 +1,9 @@
 import logging
 import requests
+import sqlite3
 from flask import Flask, jsonify, render_template
-import time
+from datetime import datetime
+import pytz
 
 app = Flask(__name__)
 
@@ -9,21 +11,40 @@ app = Flask(__name__)
 logging.basicConfig(level=logging.INFO)  # Altere para ERROR para menos verbosidade
 logger = logging.getLogger(__name__)
 
-# Cache para armazenar dados temporariamente
-cache = {
-    "data": None,
-    "timestamp": 0
-}
+def init_db():
+    conn = sqlite3.connect('crypto_data.db')
+    cursor = conn.cursor()
+    cursor.execute('''
+        CREATE TABLE IF NOT EXISTS crypto_prices (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT,
+            symbol TEXT,
+            current_price REAL,
+            market_cap REAL,
+            change_24h REAL,
+            timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
+        )
+    ''')
+    conn.commit()
+    conn.close()
 
-CACHE_DURATION = 60  # Cache por 60 segundos
+# Função para salvar dados no banco de dados
+def save_to_db(data):
+    try:
+        conn = sqlite3.connect('crypto_data.db')
+        cursor = conn.cursor()
+        cursor.execute('''
+            INSERT INTO crypto_prices (name, symbol, current_price, market_cap, change_24h, timestamp)
+            VALUES (?, ?, ?, ?, ?, ?)
+        ''', (data['name'], data['symbol'], data['current_price'], data['market_cap'], data['24h_change'], data['timestamp']))
+        conn.commit()
+        conn.close()
+        logger.info("Data saved to database successfully.")
+    except sqlite3.Error as e:
+        logger.error(f"Error saving data to the database: {e}")
 
+# Função para obter dados da API
 def get_crypto_data(crypto_id):
-    current_time = time.time()
-    # Verifica se o cache ainda é válido
-    if cache["data"] and current_time - cache["timestamp"] < CACHE_DURATION:
-        logger.info("Returning cached data.")
-        return cache["data"]
-    
     url = f"https://api.coingecko.com/api/v3/coins/{crypto_id}"
     try:
         response = requests.get(url)
@@ -33,14 +54,12 @@ def get_crypto_data(crypto_id):
             formatted_data = {
                 "name": data.get("name", "N/A"),
                 "symbol": data.get("symbol", "N/A"),
-                "current_price": data["market_data"]["current_price"].get("usd", "N/A"),
-                "market_cap": data["market_data"]["market_cap"].get("usd", "N/A"),
-                "24h_change": data["market_data"].get("price_change_percentage_24h", "N/A")
+                "current_price": data["market_data"]["current_price"].get("usd", 0),
+                "market_cap": data["market_data"]["market_cap"].get("usd", 0),
+                "24h_change": data["market_data"].get("price_change_percentage_24h", 0),
+                "timestamp": get_local_time()  # Ajusta para o fuso horário local
             }
-            # Armazena no cache
-            cache["data"] = formatted_data
-            cache["timestamp"] = current_time
-            logger.info("Data cached successfully.")
+            save_to_db(formatted_data)
             return formatted_data
         else:
             logger.error(f"Error fetching data: {response.status_code}, {response.text}")
@@ -48,6 +67,12 @@ def get_crypto_data(crypto_id):
     except Exception as e:
         logger.error(f"Exception occurred: {e}")
         return {"error": "Failed to fetch data"}
+
+# Função para obter o horário local ajustado para o fuso horário
+def get_local_time():
+    timezone = pytz.timezone('America/Sao_Paulo')  # Ajuste para o seu fuso horário
+    local_time = datetime.now(timezone)
+    return local_time.strftime('%Y-%m-%d %H:%M:%S')
 
 @app.route('/')
 def home():
@@ -59,4 +84,5 @@ def crypto(crypto_id):
     return jsonify(data)
 
 if __name__ == '__main__':
+    init_db()  # Inicializa o banco de dados
     app.run(debug=True)
