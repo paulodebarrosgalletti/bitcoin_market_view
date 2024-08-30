@@ -9,11 +9,11 @@ function fetchBitcoinPrice() {
       );
 
       if (data && data.name === "Bitcoin" && data.current_price !== undefined) {
-        priceElement.innerText = `$${data.current_price.toFixed(2)}`;
+        priceElement.innerText = `R$${data.current_price.toFixed(2)}`;
         detailsElement.innerHTML = `
                   <p>Name: ${data.name}</p>
                   <p>Symbol: ${data.symbol}</p>
-                  <p>Market Cap: $${data.market_cap}</p>
+                  <p>Market Cap: R$${data.market_cap}</p>
                   <p>24h Change: ${data["24h_change"]}%</p>
               `;
         lastUpdatedElement.innerText = new Date().toLocaleString();
@@ -43,11 +43,11 @@ function fetchDogecoinPrice() {
         data.name === "Dogecoin" &&
         data.current_price !== undefined
       ) {
-        priceElement.innerText = `$${data.current_price.toFixed(4)}`;
+        priceElement.innerText = `R$${data.current_price.toFixed(4)}`;
         detailsElement.innerHTML = `
                   <p>Name: ${data.name}</p>
                   <p>Symbol: ${data.symbol}</p>
-                  <p>Market Cap: $${data.market_cap}</p>
+                  <p>Market Cap: R$${data.market_cap}</p>
                   <p>24h Change: ${data["24h_change"]}%</p>
               `;
         lastUpdatedElement.innerText = new Date().toLocaleString();

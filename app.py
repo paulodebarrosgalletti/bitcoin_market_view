@@ -54,19 +54,50 @@ def get_crypto_data(crypto_id):
             formatted_data = {
                 "name": data.get("name", "N/A"),
                 "symbol": data.get("symbol", "N/A"),
-                "current_price": data["market_data"]["current_price"].get("usd", 0),
-                "market_cap": data["market_data"]["market_cap"].get("usd", 0),
+                "current_price": data["market_data"]["current_price"].get("brl", 0),  # Usando 'brl' para preço em reais
+                "market_cap": data["market_data"]["market_cap"].get("brl", 0),  # Usando 'brl' para market cap em reais
                 "24h_change": data["market_data"].get("price_change_percentage_24h", 0),
                 "timestamp": get_local_time()  # Ajusta para o fuso horário local
             }
             save_to_db(formatted_data)
             return formatted_data
+        elif response.status_code == 429:  # Limite de requisições excedido
+            logger.warning("API rate limit exceeded. Fetching the latest data from the database.")
+            return fetch_latest_from_db(crypto_id)
         else:
             logger.error(f"Error fetching data: {response.status_code}, {response.text}")
             return {"error": "Failed to fetch data"}
     except Exception as e:
         logger.error(f"Exception occurred: {e}")
         return {"error": "Failed to fetch data"}
+
+# Função para buscar os últimos dados disponíveis no banco de dados
+def fetch_latest_from_db(crypto_name):
+    try:
+        conn = sqlite3.connect('crypto_data.db')
+        cursor = conn.cursor()
+        cursor.execute('''
+            SELECT name, symbol, current_price, market_cap, change_24h, timestamp
+            FROM crypto_prices
+            WHERE name = ?
+            ORDER BY timestamp DESC
+            LIMIT 1
+        ''', (crypto_name.capitalize(),))  # Ajuste para capitalizar o nome da moeda
+        result = cursor.fetchone()
+        conn.close()
+        if result:
+            return {
+                "name": result[0],
+                "symbol": result[1],
+                "current_price": result[2],
+                "market_cap": result[3],
+                "24h_change": result[4],
+                "timestamp": result[5]
+            }
+        return {"error": "No data available"}
+    except sqlite3.Error as e:
+        logger.error(f"Error fetching data from the database: {e}")
+        return {"error": "Failed to fetch data from the database"}
 
 # Função para obter o horário local ajustado para o fuso horário
 def get_local_time():
